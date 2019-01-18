@@ -1,11 +1,12 @@
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-const path = require("path");
-
-module.exports = {
-  entry: "./src/index.js",
-  mode: "development",
+const config = {
+  mode: "production",
+  entry: './src/index.js',
   output: {
-    filename: "./main.js"
+    path: path.join(__dirname, 'dist'),
+    filename: './main.js'
   },
   devServer: {
     contentBase: path.join(__dirname, "dist"),
@@ -14,32 +15,42 @@ module.exports = {
     watchContentBase: true,
     progress: true
   },
-
+  plugins: [new HtmlWebpackPlugin({
+    title: 'React Boilerplate',
+    template: './src/index.html'
+  })],
+  devtool: 'source-map',
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM'
+  },
   module: {
     rules: [
       {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: "babel-loader"
+        test: /\.(js|jsx)$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        options: {
+          presets: ['@babel/preset-env', '@babel/preset-react'],
+          plugins: [ "@babel/plugin-proposal-class-properties", 'react-hot-loader/babel' ]
         }
-      },
-      {
+      }, {
         test: /\.css$/,
         use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: {
-              modules: true
-            }
-          }
+          "style-loader", "css-loader"
         ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: ["file-loader"]
       }
     ]
+  },
+  resolve: {
+    extensions: [
+      '.js',
+      '.jsx'
+    ]
+  },
+  devServer: {
+    contentBase: './dist'
   }
-};
+}
+
+module.exports = config;
